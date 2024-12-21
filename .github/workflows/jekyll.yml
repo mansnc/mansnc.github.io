@@ -1,64 +1,50 @@
-name: Deploy Jekyll site to Pages
+name: Deploy Jekyll site to GitHub Pages
 
 on:
+  # Runs on pushes to the default branch
   push:
-    branches: ["main"]
+    branches:
+      - main
+  # Allows you to manually run the workflow from GitHub UI
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Clear previous cache if exists
       - name: Clear cache
         run: rm -rf ~/.bundle/cache
 
+      # Checkout the code
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
+      # Setup Ruby
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1.4'
 
-      - name: Cache RubyGems
-        uses: actions/cache@v3
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-bundler-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bundler-
-
+      # Install dependencies
       - name: Install dependencies
         run: bundle install --path vendor/bundle --binstubs
 
+      # Check for symlinks in the _site directory
+      - name: Check for symlinks in _site directory
+        run: |
+          if [ -n "$(find ./_site -type l)" ]; then
+            echo "Symlinks found in _site directory. Please remove them!";
+            exit 1;
+          else
+            echo "No symlinks found in _site.";
+          fi
+
+      # Build with Jekyll
       - name: Build site
         run: bundle exec jekyll build
 
-      - name: Upload site artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: github-pages
-          path: ./_site  # Path to the folder with your built site
-
+      # Deploy to GitHub Pages
       - name: Deploy site to GitHub Pages
         uses: actions/deploy-pages@v4
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
