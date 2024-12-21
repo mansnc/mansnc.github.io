@@ -9,16 +9,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write  # Necessary for writing contents to the repository
+      id-token: write  # Allows the action to fetch ID token
+
     steps:
     # Checkout the repository
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Set up Ruby 3.1 or newer
+    # Set up Ruby 3.x
     - name: Set up Ruby 3.x
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.1'  # Ensures Ruby >= 3.1.0
+        ruby-version: '3.1'
 
     # Install dependencies
     - name: Install dependencies
@@ -30,7 +34,7 @@ jobs:
     - name: Build Jekyll site
       run: bundle exec jekyll build
 
-    # Deploy the site to GitHub Pages
+    # Deploy to GitHub Pages
     - name: Deploy to GitHub Pages
       uses: actions/deploy-pages@v4
       with:
