@@ -11,6 +11,7 @@ jobs:
 
     permissions:
       contents: write  # Necessary for writing contents to the repository
+      pages: write     # Allows deploying to GitHub Pages
       id-token: write  # Allows the action to fetch ID token
 
     steps:
