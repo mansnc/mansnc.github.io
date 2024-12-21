@@ -7,7 +7,7 @@ email: m.naslcheraghi@gmail.com
 description: >- 
   Explore the latest research and insights in space science, from quantum mechanics to cosmic discoveries.
 
-baseurl: "/mansnc.github.io" # the subpath of your site
+baseurl: "" # the subpath of your site
 url: "https://mansnc.github.io" # the base hostname & protocol for your site
 twitter_username: m_naslcheraghi
 github_username: mansnc
@@ -19,3 +19,4 @@ plugins:
 
 # Allow Bundler cache for faster builds
 bundler-cache: false
+

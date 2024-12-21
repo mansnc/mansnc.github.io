@@ -1,61 +1,44 @@
-name: Deploy Jekyll site to GitHub Pages
+name: Build and Deploy Jekyll Site
 
 on:
-  # Runs on pushes to the default branch
   push:
     branches:
       - main
-  # Allows you to manually run the workflow from GitHub UI
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write  # This is the permission you need
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      # Clear previous cache if exists
-      - name: Clear cache
-        run: rm -rf ~/.bundle/cache
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      # Checkout the code
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      # Setup Ruby
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1.4'
+          ruby-version: '3.1'
 
-      # Install dependencies
-      - name: Install dependencies
-        run: bundle install --path vendor/bundle --binstubs
-
-      # Check for symlinks and hard links in the _site directory
-      - name: Check size of _site directory and for symlinks/hard links
+      - name: Install Dependencies
         run: |
-          echo "Checking the size of _site directory..."
-          du -sh ./_site
-          echo "Checking for symlinks in _site directory..."
-          find ./_site -type l
-          echo "Checking for hard links in _site directory..."
-          find ./_site -type f -links +1
+          bundle install
 
-      # Build with Jekyll
-      - name: Build site
-        run: bundle exec jekyll build
+      - name: Build Site
+        run: |
+          bundle exec jekyll build
 
-      # Upload artifact for deployment
-      - name: Upload artifact for deployment
-        uses: actions/upload-artifact@v4
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
         with:
           name: github-pages
           path: ./_site
 
-      # Deploy to GitHub Pages
-      - name: Deploy site to GitHub Pages
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
