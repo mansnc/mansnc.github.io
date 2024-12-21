@@ -8,6 +8,13 @@ on:
   # Allows you to manually run the workflow from GitHub UI
   workflow_dispatch:
 
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write  # This is the permission you need
+
+
 jobs:
   build:
     runs-on: ubuntu-latest
