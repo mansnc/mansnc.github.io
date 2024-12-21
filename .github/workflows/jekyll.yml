@@ -51,4 +51,4 @@ jobs:
         timeout: 600000
         error_count: 10
         reporting_interval: 5000
-        preview: false
+        preview: True
