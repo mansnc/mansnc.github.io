@@ -3,45 +3,40 @@ name: Deploy Jekyll site to GitHub Pages
 on:
   push:
     branches:
-      - main  # or your default branch
+      - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: write  # Ensures the GitHub token has write permissions for the repository content
-      id-token: write   # Grants permission to issue an OIDC token
 
     steps:
+    # Checkout the repository
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Ruby
+    # Set up Ruby 3.1 or newer
+    - name: Set up Ruby 3.x
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '2.7'
+        ruby-version: '3.1'  # Ensures Ruby >= 3.1.0
 
+    # Install dependencies
     - name: Install dependencies
       run: |
         gem install bundler
         bundle install
 
-    - name: Build the site with Jekyll
-      run: |
-        jekyll build
+    # Build Jekyll site
+    - name: Build Jekyll site
+      run: bundle exec jekyll build
 
-    - name: List files in _site
-      run: ls -alh _site
-
-    - name: Upload artifact for GitHub Pages deployment
-      uses: actions/upload-artifact@v4
-      with:
-        name: github-pages
-        path: _site/
-
+    # Deploy the site to GitHub Pages
     - name: Deploy to GitHub Pages
       uses: actions/deploy-pages@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         artifact_name: github-pages
+        timeout: 600000
+        error_count: 10
+        reporting_interval: 5000
+        preview: false
