@@ -9,40 +9,37 @@ jobs:
   build:
     runs-on: ubuntu-latest
     
+    permissions:
+      contents: write  # Ensures the GitHub token has write permissions for the repository content
+      id-token: write   # Grants permission to issue an OIDC token
+
     steps:
-    # Checkout the repository
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Set up Ruby
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.3.6'  # specify the Ruby version you want to use
-    
-    # Install dependencies
+        ruby-version: '2.7'
+
     - name: Install dependencies
       run: |
         gem install bundler
         bundle install
-    
-    # Build the site with Jekyll
+
     - name: Build the site with Jekyll
       run: |
         jekyll build
 
-    # List files in _site to verify the build
     - name: List files in _site
       run: ls -alh _site
 
-    # Upload the build artifact
     - name: Upload artifact for GitHub Pages deployment
       uses: actions/upload-artifact@v4
       with:
         name: github-pages
         path: _site/
 
-    # Deploy to GitHub Pages using the artifact
     - name: Deploy to GitHub Pages
       uses: actions/deploy-pages@v4
       with:
