@@ -30,7 +30,7 @@ jobs:
           ruby-version: '3.1.4'
 
       - name: Cache RubyGems
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-bundler-${{ hashFiles('**/Gemfile.lock') }}
@@ -42,6 +42,12 @@ jobs:
 
       - name: Build site
         run: bundle exec jekyll build
+
+      - name: Upload site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-pages
+          path: ./_site  # Path to the folder with your built site
 
       - name: Deploy site to GitHub Pages
         uses: actions/deploy-pages@v4
