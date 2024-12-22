@@ -1,48 +1,56 @@
-name: Deploy Jekyll site to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - main
+      - master
+      - add-automated-rendering
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write  # Necessary for writing contents to the repository
-      pages: write     # Allows deploying to GitHub Pages
-      id-token: write  # Allows the action to fetch ID token
+    steps:
+      - name: Checkout repo content
+        uses: actions/checkout@v3
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.6'  # Update to the version you are using
+
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+
+      - name: Build the website
+        run: |
+          # Add your build commands here (for example, Jekyll or Hugo commands)
+          bundle exec jekyll build
+
+      - name: Upload website to GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./_site  # Adjust this to the directory where your site files are
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
 
     steps:
-    # Checkout the repository
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    # Set up Ruby 3.x
-    - name: Set up Ruby 3.x
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.1'
-
-    # Install dependencies
-    - name: Install dependencies
-      run: |
-        gem install bundler
-        bundle install
-
-    # Build Jekyll site
-    - name: Build Jekyll site
-      run: bundle exec jekyll build
-
-    # Upload the generated site as an artifact
-    - name: Upload Jekyll site artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: github-pages
-        path: _site/
-
-    # Deploy to GitHub Pages
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifact_name: github-pages
