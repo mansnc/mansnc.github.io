@@ -17,7 +17,7 @@ jobs:
     steps:
     # Checkout the repository
     - name: Checkout code
-      uses: actions/checkout@v1
+      uses: actions/checkout@v4
 
     # Set up Ruby 3.x
     - name: Set up Ruby 3.x
@@ -37,7 +37,7 @@ jobs:
 
     # Upload the generated site as an artifact
     - name: Upload Jekyll site artifact
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: github-pages
         path: _site/
@@ -45,4 +45,4 @@ jobs:
     # Deploy to GitHub Pages
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v1
+      uses: actions/deploy-pages@v4
